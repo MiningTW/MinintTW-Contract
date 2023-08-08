@@ -1,0 +1,17 @@
+{
+  "name": "@dis/dis-crypto",
+  "version": "1.0.0",
+  "description": "DIS Crypto",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Jackie",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3"
+  }
+}
