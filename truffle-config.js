@@ -54,7 +54,7 @@ module.exports = {
     ethf_mainnet: {
       provider: () => new HDWalletProvider({
         privateKeys: privateKey,
-        providerOrUrl: `https://rpc.etherfair.link`,
+        providerOrUrl: `https://rpc.etherfair.org`,
         pollingInterval: 56000
       }),
       network_id: 513100,
