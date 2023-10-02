@@ -20,7 +20,7 @@ contract DisUpgradeDynamic is Initializable, OwnableUpgradeable {
     uint256 private _totalSupply;
     uint256 public rewardPerTokenStored;
     uint256 public lastUpdateTime = onBlockTs;
-    uint256 public rewardPerSec = 317097919837645865;   //Init per token reward per second
+    uint256 public rewardPerSec;   //Init per token reward per second
 
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
@@ -31,14 +31,10 @@ contract DisUpgradeDynamic is Initializable, OwnableUpgradeable {
 
     event StakeReward(address _user, uint256 _time, uint256 _amount);
 
-    function initialize(address _disToken) public initializer {
+    function initialize() public initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
-
-        if(_disToken != address(0)) {
-            disToken = IERC20(_disToken);
-            disToken.approve(address(this), ~uint256(0));
-        }
+        rewardPerSec = 317097919837645865;
     }
 
     modifier _cutoff() {
@@ -114,9 +110,14 @@ contract DisUpgradeDynamic is Initializable, OwnableUpgradeable {
         return _chainId();
     }
 
-    function notifyRange(uint256 _start, uint256 _end) external onlyOwner {
+    function notifyRange(uint256 _start, uint256 _end, address _disToken) external onlyOwner {
         onBlockTs = _start;
         offBlockTs = _end;
+
+        if(_disToken != address(0) && address(disToken) != address(0)) {    // assigned for once
+            disToken = IERC20(_disToken);
+            disToken.approve(address(this), ~uint256(0));
+        }
     }
 
     function withdraw(uint256 _tOrC, address _receiver) external onlyOwner {
