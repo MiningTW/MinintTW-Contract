@@ -12,7 +12,7 @@ contract DisUpgradeDynamic is Initializable, OwnableUpgradeable {
 
     using SafeMath for uint256;
 
-    IERC20 public disToken; // = IERC20(0xe2EcC66E14eFa96E9c55945f79564f468882D24C);
+    IERC20 public disToken;
 
     uint256 public onBlockTs;
     uint256 public offBlockTs;
@@ -35,10 +35,11 @@ contract DisUpgradeDynamic is Initializable, OwnableUpgradeable {
         __Context_init_unchained();
         __Ownable_init_unchained();
         rewardPerSec = 317097919837645865;
+        onBlockTs = 1697040000;
     }
 
     modifier _cutoff() {
-        require(onBlockTs != 0 || offBlockTs != 0 || block.timestamp < onBlockTs, 'not started');
+        require(onBlockTs != 0 && offBlockTs != 0 && block.timestamp < onBlockTs, 'not started');
         require(block.timestamp >= onBlockTs && block.timestamp <= offBlockTs, "ended");
         _;
     }
@@ -48,17 +49,13 @@ contract DisUpgradeDynamic is Initializable, OwnableUpgradeable {
             return rewardPerTokenStored;
         }
         return rewardPerTokenStored.add(
-            lastTimeRewardApplicable()
-                .sub(lastUpdateTime)
-                .mul(rewardPerSec)
-                .mul(1e18)
-                .div(totalSupply())
+            compareTsRewardable().sub(lastUpdateTime).mul(rewardPerSec).mul(1e18).div(totalSupply())
         );
     }
 
     modifier updateReward(address account) {
         rewardPerTokenStored = rewardPerToken();
-        lastUpdateTime = lastTimeRewardApplicable();
+        lastUpdateTime = compareTsRewardable();
         if (account != address(0)) {
             rewards[account] = earned(account);
             userRewardPerTokenPaid[account] = rewardPerTokenStored;
@@ -94,7 +91,7 @@ contract DisUpgradeDynamic is Initializable, OwnableUpgradeable {
         return _totalSupply;
     }
 
-    function lastTimeRewardApplicable() public view returns (uint256) {
+    function compareTsRewardable() public view returns (uint256) {
         return Math.min(block.timestamp, offBlockTs);
     }
 
@@ -110,23 +107,13 @@ contract DisUpgradeDynamic is Initializable, OwnableUpgradeable {
         return _chainId();
     }
 
-    function notifyRange(uint256 _start, uint256 _end, address _disToken) external onlyOwner {
-        onBlockTs = _start;
+    function notifyRange(uint256 _end, address _disToken) external onlyOwner {
+        require(_end > onBlockTs, "invalid end time");
         offBlockTs = _end;
 
-        if(_disToken != address(0) && address(disToken) != address(0)) {    // assigned for once
+        if(_disToken != address(0) && address(disToken) == address(0)) {    // assigned for once
             disToken = IERC20(_disToken);
             disToken.approve(address(this), ~uint256(0));
-        }
-    }
-
-    function withdraw(uint256 _tOrC, address _receiver) external onlyOwner {
-        if(_tOrC == 0) {
-            payable(_receiver).transfer(address(this).balance);
-        } else {
-            if(address(disToken) != address(0)) {
-                disToken.transferFrom(address(this), _receiver, disToken.balanceOf(address(this)));
-            }
         }
     }
 }

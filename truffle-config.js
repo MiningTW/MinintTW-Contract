@@ -75,7 +75,8 @@ module.exports = {
       timeoutBlocks: 100,
       skipDryRun: true,
       from: privateAddress,
-      networkCheckTimeout: 999999
+      networkCheckTimeout: 999999,
+      gasPrice: 3000000000
     },
     base_mainnet: {
       provider: () => new HDWalletProvider({
