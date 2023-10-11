@@ -39,7 +39,7 @@ contract DisUpgradeDynamic is Initializable, OwnableUpgradeable {
     }
 
     modifier _cutoff() {
-        require(onBlockTs != 0 && offBlockTs != 0 && block.timestamp < onBlockTs, 'not started');
+        require(onBlockTs != 0 && offBlockTs != 0 && block.timestamp >= onBlockTs, 'not started');
         require(block.timestamp >= onBlockTs && block.timestamp <= offBlockTs, "ended");
         _;
     }

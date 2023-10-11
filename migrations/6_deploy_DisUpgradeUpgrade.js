@@ -3,15 +3,21 @@ const { deploy } = require("truffle-contract/lib/execute");
 const DisUpgradeDynamic = artifacts.require("DisUpgradeDynamic");
 const DisUpgradeManager = artifacts.require("DisUpgradeManager");
 
-const DeployedLogicContract = '0xA3D9DC4Fcd34bDDcA7E5F8cD6e98D3de7F46C01f'
-const DeployedAdminContract = '0x1d83E88F808B68372Ad5439ba5922a0e74af49C0'
-const DeployedProxyContract = '0xe218A4F06677742E62b2b4Ee6d83f7eCA11A2787'
-
-
+// ETHF
+let DeployedLogicContract = '0x5aeBD11d99f3e8291FBFFa0bd1bc1450BF6df75E'
+let DeployedAdminContract = '0xCB39a59CAe86A1E221beD165937549E815FcF72B'
+let DeployedProxyContract = '0xFbed0dF745E55dD6B9A4F6E76aE04907E607f322'
 
 const needUpdate = true
 
-module.exports = async function (deployer) {
+module.exports = async function (deployer, network) {
+  if(network=='bsc_mainnet') {
+    DeployedLogicContract = '0x88365fFE69d13eC2e387A38F7Cd924eE32147D75'
+    DeployedAdminContract = '0xcD3F3a2c7C58Ae3de0ABAE1e40b9Fe0F5B7A00Dd'
+    DeployedProxyContract = '0x3433Dd268D59a120Ed69824065cf6bE506c08262'
+  }
+  console.log(network, DeployedLogicContract, DeployedAdminContract, DeployedProxyContract)
+
   let deployedMinter = null;
 
   if(needUpdate) {
