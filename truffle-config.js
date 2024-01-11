@@ -24,33 +24,6 @@ module.exports = {
       network_id: "5777",
       websocket: true
     },
-    goerli: {
-      provider: () => new HDWalletProvider({
-        privateKeys: privateKey,
-        //providerOrUrl: `https://:${infuraSecret}@goerli.infura.io/v3/${infuraKey}`,
-        providerOrUrl: `wss://:${infuraSecret}@goerli.infura.io/ws/v3/${infuraKey}`,
-        pollingInterval: 56000
-      }),
-      network_id: 5,
-      confirmations: 2,
-      timeoutBlocks: 100,
-      skipDryRun: true,
-      from: privateAddress,
-      networkCheckTimeout: 999999
-    },
-    bsc_testnet: {
-      provider: () => new HDWalletProvider({
-        privateKeys: privateKey,
-        providerOrUrl: `https://data-seed-prebsc-1-s1.binance.org:8545`,
-        pollingInterval: 56000
-      }),
-      network_id: 97,
-      confirmations: 2,
-      timeoutBlocks: 100,
-      from: privateAddress,
-      skipDryRun: true,
-      networkCheckTimeout: 999999
-    },
     ethf_mainnet: {
       provider: () => new HDWalletProvider({
         privateKeys: privateKey,
@@ -64,32 +37,18 @@ module.exports = {
       from: privateAddress,
       networkCheckTimeout: 99999999
     },
-    bsc_mainnet: {
+    dis_mainnet: {
       provider: () => new HDWalletProvider({
         privateKeys: privateKey,
-        providerOrUrl: `https://bsc-dataseed1.ninicoin.io`,
+        providerOrUrl: `https://rpc.dischain.xyz`,
         pollingInterval: 56000
       }),
-      network_id: 56,
+      network_id: 513100,
       confirmations: 2,
       timeoutBlocks: 100,
       skipDryRun: true,
       from: privateAddress,
-      networkCheckTimeout: 999999,
-      gasPrice: 3000000000
-    },
-    base_mainnet: {
-      provider: () => new HDWalletProvider({
-        privateKeys: privateKeyBase,
-        providerOrUrl: `https://mainnet.base.org`,
-        pollingInterval: 56000
-      }),
-      network_id: 8453,
-      confirmations: 2,
-      timeoutBlocks: 100,
-      skipDryRun: true,
-      from: privateAddressBase,
-      networkCheckTimeout: 999999
+      networkCheckTimeout: 99999999
     }
   },
   mocha: {
