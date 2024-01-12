@@ -33,6 +33,7 @@ contract DisPledgeLogic is Initializable, OwnableUpgradeable {
 
     event StakeReward(address indexed _user, uint256 _time, uint256 _amount);
     event Withdrawn(address indexed _user, uint256 _amount);
+    event GetReward(address indexed _user, uint256 _amount);
 
     function initialize() public initializer {
         __Context_init_unchained();
@@ -47,6 +48,10 @@ contract DisPledgeLogic is Initializable, OwnableUpgradeable {
     modifier _onStart() {
         require(block.number >= onStartBlock && onStartBlock > 0, "DIS Pledge Not Started.");
         _;
+    }
+
+    function resetStartBlock(uint256 _start) external {
+        onStartBlock = _start;
     }
 
     function rewardPerToken() public view returns (uint256) {
@@ -97,6 +102,18 @@ contract DisPledgeLogic is Initializable, OwnableUpgradeable {
 
     function withdrawAll() external {
         withdraw(balanceOf(msg.sender));
+        getReward();
+    }
+
+    function getReward() public updateReward(msg.sender) _onStart {
+        uint256 reward = earned(msg.sender);
+        if (reward > 0) {
+            require(address(this).balance > reward, "please check the reward and balance");
+            rewards[msg.sender] = 0;
+            receiveReward[msg.sender] = receiveReward[msg.sender].add(reward);
+            payable(msg.sender).transfer(reward);
+            emit GetReward(msg.sender, reward);
+        }
     }
 
     function totalSupply() public view returns (uint256) {

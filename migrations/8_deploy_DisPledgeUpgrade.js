@@ -4,7 +4,7 @@ const DisPledgeLogic = artifacts.require("DisPledgeLogic");
 const DisPledgeManager = artifacts.require("DisPledgeManager");
 
 // DIS
-let DeployedLogicContract = '0x6C36831289858e25664B2e04E3805baBE2C08735'
+let DeployedLogicContract = '0x4B8d78865f6848923efA138746dBB77019D1e0bC'
 let DeployedAdminContract = '0xCC5c38F6DBee64b72c4e7487E2fabE63B6c21051'
 let DeployedProxyContract = '0xB0CA66Dd744b640a44AA690749BC3c3fC3ECa43A'
 
