@@ -8,7 +8,7 @@ import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract DisPledgeLogic is Initializable, OwnableUpgradeable {
+contract DisYieldLogic is Initializable, OwnableUpgradeable {
 
     using SafeMath for uint256;
 
@@ -41,13 +41,13 @@ contract DisPledgeLogic is Initializable, OwnableUpgradeable {
         __Context_init_unchained();
         __Ownable_init_unchained();
         initRewardPerSec = 317097919837645865;  //The Initial Reward Amount
+        rewardPerSec = 317097919837645865;
         offBlockTs = 4070880000;    //2099
         
         frozenStakingTime = 5 * 60; //frozen time is 5 mins
-        rewardPerSec = initRewardPerSec;
 
         // reduceBlocks = 30 * 24 * 60 * 4; // 
-        reduceBlocks = 10;  // ten blocks will reduce
+        reduceBlocks = 240;  // ten blocks will reduce
 
         onStartBlock = block.number + 10;
     }
@@ -62,7 +62,7 @@ contract DisPledgeLogic is Initializable, OwnableUpgradeable {
         if(block.number >= onStartBlock) {
             uint256 n = (block.number - onStartBlock) / (reduceBlocks);
             if(n > 0) {
-                rewardPerSec = rewardPerSec.mul( (99 ** n).div(100 ** n) );
+                rewardPerSec = initRewardPerSec.mul(99 ** n).div(100 ** n);
             }
         }
     }
