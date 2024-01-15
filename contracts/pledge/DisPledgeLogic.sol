@@ -58,8 +58,7 @@ contract DisPledgeLogic is Initializable, OwnableUpgradeable {
     }
 
     function computeRewardPerSec() internal {
-        require(reduceBlocks > 0, "Reduce Blocks not Setting.");
-        if(block.number >= onStartBlock) {
+        if(block.number >= onStartBlock && reduceBlocks > 0) {
             uint256 n = (block.number - onStartBlock) / (reduceBlocks);
             if(n > 0) {
                 rewardPerSec = rewardPerSec.mul( (99 ** n).div(100 ** n) );
@@ -161,5 +160,9 @@ contract DisPledgeLogic is Initializable, OwnableUpgradeable {
 
     function resetStartBlock(uint256 _start) external onlyOwner {
         onStartBlock = _start;
+    }
+
+    function resetFrozenStakingTime() external {
+        frozenStakingTime = 60;
     }
 }
