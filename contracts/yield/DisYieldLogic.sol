@@ -32,6 +32,7 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
     uint256 public onStartBlock;
     uint256 public reduceBlocks;
     uint256 public initRewardPerSec;
+    uint256 public onStartTs;
 
     event StakeReward(address indexed _user, uint256 _time, uint256 _amount);
     event Withdrawn(address indexed _user, uint256 _amount);
@@ -44,27 +45,30 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
         rewardPerSec = 317097919837645865;
         offBlockTs = 4070880000;    //2099
         
-        frozenStakingTime = 5 * 60; //frozen time is 5 mins
-
-        // reduceBlocks = 30 * 24 * 60 * 4; // 
-        reduceBlocks = 240;  // ten blocks will reduce
+        frozenStakingTime = 24 * 60 * 60; // frozen time is one day
+        reduceBlocks = 30 * 24 * 60 * 60; // reduce for each 30 days
 
         onStartBlock = block.number + 10;
+        onStartTs = block.timestamp + 15 * 10;
     }
 
     modifier _onStart() {
-        require(block.number >= onStartBlock && onStartBlock > 0, "DIS Pledge Not Started.");
+        require(onStartTs > 0 && block.timestamp >= onStartTs, "DIS Pledge Not Started.");
         _;
     }
 
-    function computeRewardPerSec() internal {
+    function computeRewardPerSec() public view returns(uint256) {
         require(reduceBlocks > 0, "Reduce Blocks not Setting.");
-        if(block.number >= onStartBlock) {
-            uint256 n = (block.number - onStartBlock) / (reduceBlocks);
-            if(n > 0) {
-                rewardPerSec = initRewardPerSec.mul(99 ** n).div(100 ** n);
+        uint256 _rewardPerSec_ = rewardPerSec;
+        if(block.timestamp >= onStartTs) {
+            uint256 _n = (block.timestamp - onStartTs) / reduceBlocks;
+            if(_n > 0) {
+                for (uint256 i = 0; i < _n; ++i) {
+                    _rewardPerSec_ = _rewardPerSec_.mul(99).div(100);
+                }
             }
         }
+        return _rewardPerSec_;
     }
 
     function rewardPerToken() public view returns (uint256) {
@@ -72,12 +76,12 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
             return rewardPerTokenStored;
         }
         return rewardPerTokenStored.add(
-            compareTsRewardable().sub(lastUpdateTime).mul(rewardPerSec).mul(1e18).div(totalSupply())
+            compareTsRewardable().sub(lastUpdateTime).mul(computeRewardPerSec()).mul(1e18).div(totalSupply())
         );
     }
 
     modifier updateReward(address account) {
-        computeRewardPerSec();
+        //computeRewardPerSec();
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = compareTsRewardable();
         if (account != address(0)) {
@@ -115,14 +119,14 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
 
     function withdrawAll() external {
         withdraw(balanceOf(msg.sender));
-        // getReward(); //这里需要放开，暂时不允许给奖励
+        getReward();
     }
 
     function getReward() public updateReward(msg.sender) _onStart {
-        require(address(this).balance > totalSupply(), "forbid to ");
+        require(address(this).balance > totalSupply(), "waiting for rewards deposit");
         uint256 reward = earned(msg.sender);
         if (reward > 0) {
-            require(address(this).balance > reward, "please check the reward and balance");
+            require((address(this).balance - totalSupply()) >= reward, "please check the reward and balance");
             rewards[msg.sender] = 0;
             receiveReward[msg.sender] = receiveReward[msg.sender].add(reward);
             payable(msg.sender).transfer(reward);
@@ -157,9 +161,5 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
     function notifyRange(uint256 _end) external onlyOwner {
         require(_end > onBlockTs, "invalid end time");
         offBlockTs = _end;
-    }
-
-    function resetStartBlock(uint256 _start) external onlyOwner {
-        onStartBlock = _start;
     }
 }
