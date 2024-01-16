@@ -4,9 +4,9 @@ const DisYieldLogic = artifacts.require("DisYieldLogic");
 const DisYieldManager = artifacts.require("DisYieldManager");
 
 // DIS
-let DeployedLogicContract = '0x0Fd4a5e92Ff19B2c74A62a7435b4871326DCc69A'
-let DeployedAdminContract = '0x39e793127Aeedb77F72fF5a179DB2ee642fa002A'
-let DeployedProxyContract = '0xD135726adA1Bb395947a871909379d09Aa83d3b3'
+let DeployedLogicContract = '0xc5D4e9a236c57Ff0DD55a6E210f730f3F0B38D9f'
+let DeployedAdminContract = '0x5703Fca41771F04AFB64deE665E8A877B11186F8'
+let DeployedProxyContract = '0x26bdaC451fE5A111a9D8a066c23BD0F099b9E563'
 
 const needUpdate = true
 

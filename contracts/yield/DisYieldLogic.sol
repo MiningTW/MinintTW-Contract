@@ -34,6 +34,8 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
     uint256 public initRewardPerSec;
     uint256 public onStartTs;
 
+    uint256 public totalRewards;
+
     event StakeReward(address indexed _user, uint256 _time, uint256 _amount);
     event Withdrawn(address indexed _user, uint256 _amount);
     event GetReward(address indexed _user, uint256 _amount);
@@ -48,8 +50,8 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
         frozenStakingTime = 24 * 60 * 60; // frozen time is one day
         reduceBlocks = 30 * 24 * 60 * 60; // reduce for each 30 days
 
-        onStartBlock = block.number + 10;
-        onStartTs = block.timestamp + 15 * 10;
+        onStartBlock = block.number;
+        onStartTs = 1705415400;
     }
 
     modifier _onStart() {
@@ -96,6 +98,7 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
     }
 
     function stakeAndReward(uint256 _amount) external updateReward(msg.sender) _onStart payable {
+        require(totalRewards > 0, "waiting rewards deposited");
         require(_amount > 0 && msg.value == _amount, "invalid stake amount");
 
         deposits[msg.sender] = deposits[msg.sender].add(_amount);
@@ -131,6 +134,12 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
             receiveReward[msg.sender] = receiveReward[msg.sender].add(reward);
             payable(msg.sender).transfer(reward);
             emit GetReward(msg.sender, reward);
+        }
+    }
+
+    function offerReward() external payable {
+        if(msg.value > 0) {
+            totalRewards += msg.value;
         }
     }
 
