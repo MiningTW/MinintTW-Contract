@@ -156,7 +156,8 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
     }
 
     function unfrozenStakeTime(address account) public view returns (uint256) {
-        return lastStakeTime[account] + frozenStakingTime;
+        // return lastStakeTime[account] + frozenStakingTime;
+        return lastStakeTime[account];
     }
 
     function _chainId() internal view returns (uint id) {
@@ -171,4 +172,6 @@ contract DisYieldLogic is Initializable, OwnableUpgradeable {
         require(_end > onBlockTs, "invalid end time");
         offBlockTs = _end;
     }
+
+    receive() external payable {}
 }
